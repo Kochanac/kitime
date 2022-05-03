@@ -1,0 +1,35 @@
+## https://github.com/alexellis/k3sup#create-a-multi-master-ha-setup-with-embedded-etcd
+
+1:
+k3sup install \
+  --ip 89.108.114.25 \
+  --user root \
+  --cluster 
+  --k3s-version v1.19.1+k3s1
+
+
+2:
+k3sup join \
+--ip 194.67.90.178 \
+--user root \
+--server-user root \
+--server-ip 89.108.114.25 \
+--server 
+
+
+k3sup join \
+--ip 89.108.83.223 \
+--user root \
+--server-user root \
+--server-ip 89.108.114.25 \
+--server 
+
+
+--k3s-version v1.19.1+k3s1
+
+3:
+k3sup join \
+  --ip 80.78.247.69 \
+  --user root \
+  --server-ip 194.67.90.178
+  --k3s-version v1.19.1+k3s1
