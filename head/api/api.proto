@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package head;
+
+option go_package = "internal/api";
+// ~/uni/coursework/vobla/head > protoc --go_opt=paths=import --go_out=./ --go-grpc_out=. --go-grpc_opt=paths=import api/api.proto
+
+import "google/protobuf/timestamp.proto";
+
+service head {
+  rpc Set(SetRequest) returns (SetReply);
+  rpc Get(GetRequest) returns (GetReply);
+}
+
+message SetRequest {
+  uint32 user_id = 1;
+  google.protobuf.Timestamp event_time = 2;
+
+  enum EVENT_TYPE {
+    watch = 0;
+    scroll = 1;
+  };
+  EVENT_TYPE event_type = 3;
+
+  uint32 video_id = 4;
+  uint32 video_time = 5; // in seconds
+}
+
+message SetReply {}
+
+message GetRequest {
+  uint32 user_id = 1;
+  uint32 video_id = 2;
+}
+
+message GetReply {
+  uint32 video_time = 1;
+}

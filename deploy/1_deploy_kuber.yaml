@@ -1,0 +1,38 @@
+- hosts: localhost
+  tasks:
+    - name: Fetch k3sup setup
+      get_url:
+        url: https://get.k3sup.dev
+        dest: /usr/local/bin/getk3sup.sh
+        mode: 0755
+      become: yes
+      register: fetchgetk3sup
+
+    - name: Install k3sup binary
+      when: fetchgetk3sup is succeeded
+      command: /usr/local/bin/getk3sup.sh
+      become: yes
+      register: installk3sup
+
+- hosts: first_master
+  connection: local
+  tasks:
+    - name: Run k3sup
+      ansible.builtin.command: >
+        k3sup install 
+        --ip {{ inventory_hostname }}
+        --user root 
+        --cluster 
+
+- hosts: masters
+  connection: local
+  tasks:
+    - name: Run k3sup
+      ansible.builtin.command: >
+        k3sup join \
+        --ip {{ inventory_hostname }} \
+        --user root \
+        --server-user root \
+        --server-ip {{ groups["first_master"][0] }} \
+        --server 
+

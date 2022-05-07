@@ -72,6 +72,24 @@
         state: present
         src: kafka_config.yaml
 
+    - name: Make kafka topic
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: kafka.strimzi.io/v1beta2
+          kind: KafkaTopic
+          metadata:
+            name: vobla-topic
+            namespace: infra
+            labels:
+              strimzi.io/cluster: kafka-cluster
+          spec:
+            partitions: 1
+            replicas: 1
+            config:
+              retention.ms: 7200000
+              segment.bytes: 1073741824
+
     - name: Install Clickhouse operator
       kubernetes.core.k8s:
         state: present

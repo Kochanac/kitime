@@ -1,0 +1,11 @@
+all:
+  children:
+    first_master:
+      hosts:
+        "194.67.74.183":
+    masters:
+      hosts:
+        "89.108.102.20":
+        "89.108.103.13":
+
+
