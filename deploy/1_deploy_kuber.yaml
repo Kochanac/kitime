@@ -36,3 +36,14 @@
         --server-ip {{ groups["first_master"][0] }} \
         --server 
 
+- hosts: workers
+  connection: local
+  tasks:
+    - name: Run k3sup
+      ansible.builtin.command: >
+        k3sup join \
+        --ip {{ inventory_hostname }} \
+        --user root \
+        --server-user root \
+        --server-ip {{ groups["first_master"][0] }} 
+

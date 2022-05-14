@@ -24,3 +24,13 @@ services:
       - ALLOW_PLAINTEXT_LISTENER=yes
     depends_on:
       - zookeeper
+
+  app:
+    image: 'head'
+    ports:
+        - '23:9666'
+    environment:
+        - REDIS_HOST=localhost
+        - KAFKA_HOST=kafka:9092
+        - KAFKA_TOPIC=test-topic
+        - CLICK_HOST=clickhouse:9000

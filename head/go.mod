@@ -5,6 +5,7 @@ go 1.17
 replace github.com/Kochanac/vobla/head/pkg/config => ./pkg/config
 
 require (
+	github.com/ClickHouse/clickhouse-go/v2 v2.0.12
 	github.com/Kochanac/vobla/head/pkg/config v0.0.0-00010101000000-000000000000
 	github.com/Shopify/sarama v1.32.0
 	google.golang.org/grpc v1.45.0
@@ -12,7 +13,6 @@ require (
 )
 
 require (
-	github.com/ClickHouse/clickhouse-go/v2 v2.0.12 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/eapache/go-resiliency v1.2.0 // indirect
 	github.com/eapache/go-xerial-snappy v0.0.0-20180814174437-776d5712da21 // indirect

@@ -35,8 +35,9 @@ func main() {
 	pb.RegisterHeadServer(s, &server.HeadServer{
 		Config:           c,
 		KafkaProducer:    producer,
-		ClickhouseClient: clickhouse.Init(c.GetClickhouseHost()),
+		ClickhouseClient: clickhouse.Init(c.GetClickhouseHost(), c.GetClickhouseUser(), c.GetClickhousePassword()),
 	})
+
 	log.Printf("server listening at %v", lis.Addr())
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)

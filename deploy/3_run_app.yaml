@@ -1,0 +1,103 @@
+- hosts: localhost
+  tasks:
+    - name: Build a docker image
+      community.docker.docker_image: 
+        name: ghcr.io/kochanac/head_app
+        tag: latest
+        state: absent
+
+    - name: Build a docker image
+      community.docker.docker_image: 
+        name: ghcr.io/kochanac/head_app
+        tag: latest
+        state: present
+        source: build
+        build:
+          path: ../head
+          platform: linux/amd64
+        push: yes
+
+    # firstly
+    # https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry
+    # docker push ghcr.io/kochanac/head_app:latest
+
+    - name: Create deploy namespace
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Namespace
+          metadata:
+            name: deploy
+
+    - name: Create deploy namespace
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: ghcr-registry
+            namespace: deploy
+          data: 
+            .dockerconfigjson: ewoJImF1dGhzIjogewoJCSJnaGNyLmlvIjogewoJCQkiYXV0aCI6ICJWVk5GVWs1QlRVVTZaMmh3WHpsSVpUa3dPRUV3VjJKYVpERnlZV1JrYzBwVFFtVkZlRWcwVlRSTFRESkNVMUJDWWc9PSIKCQl9Cgl9Cn0=
+          type: kubernetes.io/dockerconfigjson
+
+    - name: \"head\" app deployment
+      kubernetes.core.k8s:
+        definition:
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: app-deployment
+            namespace: deploy
+            labels:
+              app: app_head
+          spec:
+            replicas: 3
+            selector:
+              matchLabels:
+                app: app_head
+            template:
+              metadata:
+                labels:
+                  app: app_head
+              spec:
+                containers:
+                  - name: head
+                    image: ghcr.io/kochanac/head_app:latest
+                    platform: linux/amd64
+                    env:
+                      - name: REDIS_HOST
+                        value: localhost
+                      - name: KAFKA_HOST
+                        value: kafka-cluster-kafka-bootstrap.infra:9092
+                      - name: KAFKA_TOPIC
+                        value: vobla-topic
+                      - name: CLICK_HOST
+                        value: clickhouse-clickhouse-cluster.infra:9000
+                      - name: CLICK_USER
+                        value: head
+                      - name: CLICK_PASSWORD
+                        value: qwerty
+                    ports:
+                    - containerPort: 9666
+                imagePullSecrets:
+                  - name: ghcr-registry
+
+    - name: head load balancer
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Service
+          metadata:
+            name: head-balancer
+            namespace: deploy
+          spec:
+            selector:
+              app: app_head
+            ports:
+              - port: 9666
+                targetPort: 9666
+            type: LoadBalancer

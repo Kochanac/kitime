@@ -20,6 +20,14 @@ func (c Config) GetClickhouseHost() string {
 	return c.GetKey("CLICK_HOST")
 }
 
+func (c Config) GetClickhouseUser() string {
+	return c.GetKey("CLICK_USER")
+}
+
+func (c Config) GetClickhousePassword() string {
+	return c.GetKey("CLICK_PASSWORD")
+}
+
 func (c Config) GetKafkaTopic() string {
 	return c.GetKey("KAFKA_TOPIC")
 }

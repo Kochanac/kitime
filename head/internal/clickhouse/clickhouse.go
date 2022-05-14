@@ -31,13 +31,13 @@ func (c clickhouseClient) GetRow(userID, videoID uint32) (res UserVideoTimesRow,
 	return
 }
 
-func Init(host string) Client {
+func Init(host, user, password string) Client {
 	conn := clickhouse.OpenDB(&clickhouse.Options{
 		Addr: []string{host},
 		Auth: clickhouse.Auth{
 			Database: "default",
-			Username: "default",
-			Password: "",
+			Username: user,
+			Password: password,
 		},
 		Settings: clickhouse.Settings{
 			"max_execution_time": 60,
@@ -46,7 +46,7 @@ func Init(host string) Client {
 		Compression: &clickhouse.Compression{
 			Method: clickhouse.CompressionLZ4,
 		},
-		Debug: true,
+		Debug: false,
 	})
 	conn.SetMaxIdleConns(5)
 	conn.SetMaxOpenConns(10)
