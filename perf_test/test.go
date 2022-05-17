@@ -25,14 +25,15 @@ func dataFunc(mtd *desc.MethodDescriptor, cd *runner.CallData) []byte {
 }
 
 func main() {
+	var rps uint = 3000
 	report, err := runner.Run(
 		"head.head.Set",
-		"151.248.121.198:9666",
-		runner.WithProtoFile("../head/api/api.proto", []string{}),
+		"80.78.251.9:9666",
+		runner.WithProtoFile("../service/api/api.proto", []string{}),
 		runner.WithInsecure(true),
 		runner.WithBinaryDataFunc(dataFunc),
-		runner.WithTotalRequests(500000),
-		runner.WithRPS(10000),
+		runner.WithTotalRequests(rps*20),
+		runner.WithRPS(rps),
 	)
 
 	if err != nil {

@@ -13,7 +13,7 @@
         state: present
         source: build
         build:
-          path: ../head
+          path: ../service
           platform: linux/amd64
         push: yes
 
@@ -43,7 +43,7 @@
             .dockerconfigjson: ewoJImF1dGhzIjogewoJCSJnaGNyLmlvIjogewoJCQkiYXV0aCI6ICJWVk5GVWs1QlRVVTZaMmh3WHpsSVpUa3dPRUV3VjJKYVpERnlZV1JrYzBwVFFtVkZlRWcwVlRSTFRESkNVMUJDWWc9PSIKCQl9Cgl9Cn0=
           type: kubernetes.io/dockerconfigjson
 
-    - name: \"head\" app deployment
+    - name: Service app deployment
       kubernetes.core.k8s:
         definition:
           apiVersion: apps/v1

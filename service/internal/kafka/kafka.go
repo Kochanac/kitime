@@ -3,7 +3,7 @@ package kafka
 import (
 	"context"
 	"fmt"
-	"github.com/Kochanac/vobla/head/pkg/config"
+	"github.com/Kochanac/kitime/service/pkg/config"
 	"github.com/Shopify/sarama"
 	"log"
 	"os"

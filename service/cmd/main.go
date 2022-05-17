@@ -3,11 +3,11 @@ package main
 import (
 	"flag"
 	"fmt"
-	pb "github.com/Kochanac/vobla/head/internal/api"
-	"github.com/Kochanac/vobla/head/internal/clickhouse"
-	"github.com/Kochanac/vobla/head/internal/kafka"
-	"github.com/Kochanac/vobla/head/internal/server"
-	"github.com/Kochanac/vobla/head/pkg/config"
+	pb "github.com/Kochanac/kitime/service/internal/api"
+	"github.com/Kochanac/kitime/service/internal/clickhouse"
+	"github.com/Kochanac/kitime/service/internal/kafka"
+	"github.com/Kochanac/kitime/service/internal/server"
+	"github.com/Kochanac/kitime/service/pkg/config"
 	"log"
 	"net"
 

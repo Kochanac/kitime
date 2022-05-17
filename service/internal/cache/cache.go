@@ -3,7 +3,7 @@ package cache
 import (
 	"context"
 	"fmt"
-	pb "github.com/Kochanac/vobla/head/internal/api"
+	pb "github.com/Kochanac/kitime/service/internal/api"
 )
 
 func CheckCache(ctx context.Context, req pb.GetRequest) (*pb.GetReply, error) {

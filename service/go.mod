@@ -1,12 +1,12 @@
-module github.com/Kochanac/vobla/head
+module github.com/Kochanac/kitime/service
 
 go 1.17
 
-replace github.com/Kochanac/vobla/head/pkg/config => ./pkg/config
+replace github.com/Kochanac/kitime/service/pkg/config => ./pkg/config
 
 require (
 	github.com/ClickHouse/clickhouse-go/v2 v2.0.12
-	github.com/Kochanac/vobla/head/pkg/config v0.0.0-00010101000000-000000000000
+	github.com/Kochanac/kitime/service/pkg/config v0.0.0-00010101000000-000000000000
 	github.com/Shopify/sarama v1.32.0
 	google.golang.org/grpc v1.45.0
 	google.golang.org/protobuf v1.28.0
