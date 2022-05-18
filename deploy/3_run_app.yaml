@@ -1,10 +1,10 @@
 - hosts: localhost
   tasks:
-    - name: Build a docker image
-      community.docker.docker_image: 
-        name: ghcr.io/kochanac/head_app
-        tag: latest
-        state: absent
+    # - name: Build a docker image
+    #   community.docker.docker_image: 
+    #     name: ghcr.io/kochanac/head_app
+    #     tag: latest
+    #     state: absent
 
     - name: Build a docker image
       community.docker.docker_image: 

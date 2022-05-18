@@ -1,0 +1,95 @@
+
+- hosts: localhost
+  tasks:
+    # MONITORING
+
+    - name: Create monitoring namespace
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Namespace
+          metadata:
+            name: monitoring
+
+    - name: Add kubernetes-dashboard repo
+      kubernetes.core.helm_repository:
+        name: kubernetes-dashboard
+        repo_url: https://kubernetes.github.io/dashboard/
+
+    - name: Deploy kubernetes dashboard
+      kubernetes.core.helm:
+        name: kubernetes-dashboard
+        namespace: monitoring
+        chart_ref: kubernetes-dashboard/kubernetes-dashboard
+
+    - name: Create admin-user
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: ServiceAccount
+          metadata:
+            name: admin-user
+            namespace: kube-system
+
+    - name: ClusterRoleBinding admin-user 
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: rbac.authorization.k8s.io/v1
+          kind: ClusterRoleBinding
+          metadata:
+            name: admin-user
+          roleRef:
+            apiGroup: rbac.authorization.k8s.io
+            kind: ClusterRole
+            name: cluster-admin
+          subjects:
+          - kind: ServiceAccount
+            name: admin-user
+            namespace: kube-system
+
+    # - name: Deploy metrics-exporter 
+    #   kubernetes.core.k8s:
+    #     state: present
+    #     src: vendor/metrics-server.yaml
+
+    - name: Add helm repo
+      kubernetes.core.helm_repository:
+        name: prometheus-community
+        repo_url: https://prometheus-community.github.io/helm-charts
+
+    - name: Deploy prometheus
+      kubernetes.core.helm:
+        name: prometheus
+        namespace: monitoring
+        chart_ref: prometheus-community/kube-prometheus-stack
+        values:
+          grafana:
+            adminPassword: ЬСЛДВЬСЛДьЛьлдьЛДЬлдьЛДЬДЛЬдльдлЬДЛЬ
+            service:
+              enabled: true
+              type: LoadBalancer
+              port: 8888
+              targetPort: 3000
+              annotations: {}
+              labels: {}
+              portName: service
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
