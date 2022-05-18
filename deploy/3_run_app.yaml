@@ -1,6 +1,6 @@
 - hosts: localhost
   tasks:
-    # - name: Build a docker image
+    # - name: Remove a docker image
     #   community.docker.docker_image: 
     #     name: ghcr.io/kochanac/head_app
     #     tag: latest
@@ -62,6 +62,7 @@
               metadata:
                 labels:
                   app: app_head
+                  metrics: service_kitime
               spec:
                 containers:
                   - name: head
@@ -82,6 +83,8 @@
                         value: qwerty
                     ports:
                     - containerPort: 9666
+                    - name: metrics
+                      containerPort: 9100
                 imagePullSecrets:
                   - name: ghcr-registry
 
@@ -101,3 +104,20 @@
               - port: 9666
                 targetPort: 9666
             type: LoadBalancer
+
+    - name: Service / metrics port
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Service
+          metadata:
+            name: metrics-app
+            namespace: deploy
+          spec:
+            selector:
+              app: app_head
+            ports:
+              - port: 9233
+                targetPort: 9100
+            type: NodePort

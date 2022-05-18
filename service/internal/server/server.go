@@ -8,10 +8,14 @@ import (
 	pb "github.com/Kochanac/kitime/service/internal/api"
 	"github.com/Kochanac/kitime/service/internal/clickhouse"
 	"github.com/Kochanac/kitime/service/internal/kafka"
+	"github.com/Kochanac/kitime/service/internal/metrics"
 	"github.com/Kochanac/kitime/service/pkg/config"
+	"github.com/prometheus/client_golang/prometheus"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"log"
+	"strconv"
+	"time"
 )
 
 type HeadServer struct {
@@ -53,6 +57,8 @@ func marshalData(dataRaw *pb.SetRequest) (string, error) {
 }
 
 func (s *HeadServer) Set(ctx context.Context, request *pb.SetRequest) (*pb.SetReply, error) {
+	time0 := time.Now()
+
 	log.Printf("Received: %v", request)
 
 	data, err := marshalData(request)
@@ -65,10 +71,17 @@ func (s *HeadServer) Set(ctx context.Context, request *pb.SetRequest) (*pb.SetRe
 		return nil, status.Errorf(codes.Unavailable, "Kafka error: %w", err)
 	}
 
+	metrics.RequestsMetric.With(prometheus.Labels{
+		"type":      "set",
+		"resp_type": "ok",
+		"time":      strconv.Itoa(int(time.Since(time0).Milliseconds())),
+	}).Inc()
 	return &pb.SetReply{}, nil
 }
 
 func (s *HeadServer) Get(ctx context.Context, request *pb.GetRequest) (*pb.GetReply, error) {
+	time0 := time.Now()
+
 	row, err := s.ClickhouseClient.GetRow(request.GetUserId(), request.GetVideoId())
 
 	if errors.Is(err, sql.ErrNoRows) {
@@ -78,5 +91,10 @@ func (s *HeadServer) Get(ctx context.Context, request *pb.GetRequest) (*pb.GetRe
 		return nil, status.Errorf(codes.Unavailable, "Failed to receive data from Clickhouse: %s", err)
 	}
 
+	metrics.RequestsMetric.With(prometheus.Labels{
+		"type":      "get",
+		"resp_type": "ok",
+		"time":      strconv.Itoa(int(time.Since(time0).Milliseconds())),
+	}).Inc()
 	return &pb.GetReply{VideoTime: row.VideoTimestamp}, nil
 }

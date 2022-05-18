@@ -76,20 +76,42 @@
               annotations: {}
               labels: {}
               portName: service
+          prometheus:
+            prometheusSpec:
+              # Pick up all service monitors across all namespaces.
+              serviceMonitorNamespaceSelector: {}
+              serviceMonitorSelector: {}
+              # Pick up all pod monitors across all namespaces.
+              podMonitorNamespaceSelector: {}
+              podMonitorSelector: {}
+            additionalPodMonitors: 
+              - name: "lox"
+                namespaceSelector:
+                  any: true
+                podMetricsEndpoints:
+                  - port: metrics
+                # - path: /metrics
+                #   port: "9100"
+                selector: {}
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    # - name: Deploy Pod Monitors
+      # kubernetes.core.k8s:
+      #   state: present
+      #   definition:
+      #     apiVersion: monitoring.coreos.com/v1
+      #     kind: PodMonitor
+      #     metadata:
+      #       name: pod-monitor-kitime
+      #       namespace: monitoring
+      #     spec:
+      #       selector:
+      #         matchLabels:
+      #           metrics: service_kitime
+      #       namespaceSelector:
+      #         any: true
+      #       podMetricsEndpoints:
+      #       - path: /metrics
+      #         port: "9100"
+            
 

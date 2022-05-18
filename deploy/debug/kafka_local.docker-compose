@@ -29,6 +29,7 @@ services:
     image: 'head'
     ports:
         - '23:9666'
+        - '9100:9100'
     environment:
         - REDIS_HOST=localhost
         - KAFKA_HOST=kafka:9092
