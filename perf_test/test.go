@@ -34,6 +34,8 @@ func main() {
 		runner.WithBinaryDataFunc(dataFunc),
 		runner.WithTotalRequests(rps*20),
 		runner.WithRPS(rps),
+		runner.WithAsync(true),
+		runner.WithConnections(rps/2),
 	)
 
 	if err != nil {

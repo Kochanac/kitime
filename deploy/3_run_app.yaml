@@ -43,7 +43,7 @@
             .dockerconfigjson: ewoJImF1dGhzIjogewoJCSJnaGNyLmlvIjogewoJCQkiYXV0aCI6ICJWVk5GVWs1QlRVVTZaMmh3WHpsSVpUa3dPRUV3VjJKYVpERnlZV1JrYzBwVFFtVkZlRWcwVlRSTFRESkNVMUJDWWc9PSIKCQl9Cgl9Cn0=
           type: kubernetes.io/dockerconfigjson
 
-    - name: Service app deployment
+    - name: kitime app deployment
       kubernetes.core.k8s:
         definition:
           apiVersion: apps/v1
@@ -88,14 +88,14 @@
                 imagePullSecrets:
                   - name: ghcr-registry
 
-    - name: head load balancer
+    - name: kitime load balancer
       kubernetes.core.k8s:
         state: present
         definition:
           apiVersion: v1
           kind: Service
           metadata:
-            name: head-balancer
+            name: kitime-grpc
             namespace: deploy
           spec:
             selector:
@@ -105,19 +105,22 @@
                 targetPort: 9666
             type: LoadBalancer
 
-    - name: Service / metrics port
-      kubernetes.core.k8s:
-        state: present
-        definition:
-          apiVersion: v1
-          kind: Service
-          metadata:
-            name: metrics-app
-            namespace: deploy
-          spec:
-            selector:
-              app: app_head
-            ports:
-              - port: 9233
-                targetPort: 9100
-            type: NodePort
+    # - name: kitime ingress
+    #   kubernetes.core.k8s:
+    #     state: present
+    #     definition:
+    #       apiVersion: traefik.containo.us/v1alpha1
+    #       kind: IngressRouteTCP
+    #       metadata:
+    #         name: kitime-ingress
+    #         namespace: deploy
+    #       spec:
+    #         routes:
+    #         - match: HostSNI(`*`) # [3]
+    #           # priority: 10                    # [4]
+    #           # middlewares:                    # [5]
+    #           # - name: middleware1             # [6]
+    #           #   namespace: default            # [7]
+    #           services:                       # [8]
+    #           - name: kitime-grpc
+    #             port: 9666

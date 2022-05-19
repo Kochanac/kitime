@@ -12,6 +12,7 @@
   connection: local
   tasks:
     - name: Run k3sup
+      retries: 3
       ansible.builtin.command: >
         k3sup join \
         --ip {{ inventory_hostname }} \
@@ -24,6 +25,7 @@
   connection: local
   tasks:
     - name: Run k3sup
+      retries: 3
       ansible.builtin.command: >
         k3sup join \
         --ip {{ inventory_hostname }} \

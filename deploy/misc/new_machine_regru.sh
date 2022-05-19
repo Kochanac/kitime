@@ -1,7 +1,13 @@
-#!/bin/bash
+#!/bin/sh
 
+if [[ $# -ne 1 ]]; then
+	echo 'usage: ./new_machines.sh <number of machines>'
+	exit
+fi
 
-for i in {1..4}; do
+echo creating $1 machines
+
+for i in `seq $1`; do
 	json="
 	{
 		\"name\": \"k8s-$i\",
@@ -20,5 +26,5 @@ for i in {1..4}; do
 
 done
 
-curl -X GET -H "Authorization: Bearer $TOKEN" \
+curl -X GET -H "Authorization: Bearer $(cat regru_token.txt)" \
 -H "Content-Type: application/json" 'https://api.cloudvps.reg.ru/v1/reglets' | grep '"ip":' | cut -d':' -f2
