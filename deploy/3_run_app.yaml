@@ -103,24 +103,24 @@
             ports:
               - port: 9666
                 targetPort: 9666
-            type: LoadBalancer
+            type: ClusterIP
 
-    # - name: kitime ingress
-    #   kubernetes.core.k8s:
-    #     state: present
-    #     definition:
-    #       apiVersion: traefik.containo.us/v1alpha1
-    #       kind: IngressRouteTCP
-    #       metadata:
-    #         name: kitime-ingress
-    #         namespace: deploy
-    #       spec:
-    #         routes:
-    #         - match: HostSNI(`*`) # [3]
-    #           # priority: 10                    # [4]
-    #           # middlewares:                    # [5]
-    #           # - name: middleware1             # [6]
-    #           #   namespace: default            # [7]
-    #           services:                       # [8]
-    #           - name: kitime-grpc
-    #             port: 9666
+    - name: kitime ingress
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: traefik.containo.us/v1alpha1
+          kind: IngressRouteTCP
+          metadata:
+            name: kitime-ingress
+            namespace: deploy
+          spec:
+            routes:
+            - match: HostSNI(`*`) # [3]
+              # priority: 10                    # [4]
+              # middlewares:                    # [5]
+              # - name: middleware1             # [6]
+              #   namespace: default            # [7]
+              services:                       # [8]
+              - name: kitime-grpc
+                port: 9666
