@@ -76,6 +76,11 @@ func (s *HeadServer) Set(ctx context.Context, request *pb.SetRequest) (*pb.SetRe
 		"resp_type": "ok",
 		"time":      strconv.Itoa(int(time.Since(time0).Milliseconds())),
 	}).Inc()
+
+	metrics.RequestsTimeSum.With(prometheus.Labels{
+		"type":      "set",
+		"resp_type": "ok",
+	}).Add(float64(time.Since(time0).Milliseconds()))
 	return &pb.SetReply{}, nil
 }
 
@@ -94,7 +99,10 @@ func (s *HeadServer) Get(ctx context.Context, request *pb.GetRequest) (*pb.GetRe
 	metrics.RequestsMetric.With(prometheus.Labels{
 		"type":      "get",
 		"resp_type": "ok",
-		"time":      strconv.Itoa(int(time.Since(time0).Milliseconds())),
 	}).Inc()
+	metrics.RequestsTimeSum.With(prometheus.Labels{
+		"type":      "get",
+		"resp_type": "ok",
+	}).Add(float64(time.Since(time0).Milliseconds()))
 	return &pb.GetReply{VideoTime: row.VideoTimestamp}, nil
 }

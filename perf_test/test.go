@@ -35,6 +35,7 @@ func main() {
 		runner.WithTotalRequests(rps*200),
 		runner.WithRPS(rps),
 		runner.WithAsync(true),
+		runner.WithConnections(8),
 	)
 
 	if err != nil {
