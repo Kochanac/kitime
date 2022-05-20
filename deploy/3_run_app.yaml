@@ -70,7 +70,7 @@
                     platform: linux/amd64
                     env:
                       - name: REDIS_HOST
-                        value: localhost
+                        value: redis-master.infra:6379
                       - name: KAFKA_HOST
                         value: kafka-cluster-kafka-bootstrap.infra:9092
                       - name: KAFKA_TOPIC
