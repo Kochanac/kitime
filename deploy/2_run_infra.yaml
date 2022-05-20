@@ -22,6 +22,10 @@
         name: kubernetes-dashboard
         namespace: monitoring
         chart_ref: kubernetes-dashboard/kubernetes-dashboard
+        values:
+          service:
+            type: LoadBalancer
+            externalPort: 9443
 
     - name: Create admin-user
       kubernetes.core.k8s:

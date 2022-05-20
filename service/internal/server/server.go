@@ -6,15 +6,14 @@ import (
 	"encoding/json"
 	"errors"
 	pb "github.com/Kochanac/kitime/service/internal/api"
+	"github.com/Kochanac/kitime/service/internal/cache"
 	"github.com/Kochanac/kitime/service/internal/clickhouse"
 	"github.com/Kochanac/kitime/service/internal/kafka"
 	"github.com/Kochanac/kitime/service/internal/metrics"
 	"github.com/Kochanac/kitime/service/pkg/config"
-	"github.com/prometheus/client_golang/prometheus"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"log"
-	"strconv"
 	"time"
 )
 
@@ -23,6 +22,7 @@ type HeadServer struct {
 	Config           config.Config
 	KafkaProducer    kafka.Producer
 	ClickhouseClient clickhouse.Client
+	CacheClient      cache.Cache
 }
 
 func abs(i int64) int64 {
@@ -56,8 +56,18 @@ func marshalData(dataRaw *pb.SetRequest) (string, error) {
 	return string(marshalled), nil
 }
 
-func (s *HeadServer) Set(ctx context.Context, request *pb.SetRequest) (*pb.SetReply, error) {
+func (s *HeadServer) Set(ctx context.Context, request *pb.SetRequest) (reply *pb.SetReply, err error) {
 	time0 := time.Now()
+	defer func() {
+		if err == nil {
+			metrics.ObserveRequests("set", "ok")
+			metrics.ObserveRequestsTimeSum("set", "ok", time.Since(time0).Seconds())
+		} else {
+			errStatus, _ := status.FromError(err)
+			metrics.ObserveRequests("set", errStatus.Code().String())
+			metrics.ObserveRequestsTimeSum("set", errStatus.Code().String(), time.Since(time0).Seconds())
+		}
+	}()
 
 	log.Printf("Received: %v", request)
 
@@ -71,38 +81,49 @@ func (s *HeadServer) Set(ctx context.Context, request *pb.SetRequest) (*pb.SetRe
 		return nil, status.Errorf(codes.Unavailable, "Kafka error: %w", err)
 	}
 
-	metrics.RequestsMetric.With(prometheus.Labels{
-		"type":      "set",
-		"resp_type": "ok",
-		"time":      strconv.Itoa(int(time.Since(time0).Milliseconds())),
-	}).Inc()
+	err = s.CacheClient.SaveToCache(ctx,
+		&pb.GetRequest{UserId: request.GetUserId(), VideoId: request.GetVideoId()},
+		&pb.GetReply{VideoTime: request.VideoTime})
+	if err != nil {
+		log.Printf("failed to save to cache: %s", err)
+	}
 
-	metrics.RequestsTimeSum.With(prometheus.Labels{
-		"type":      "set",
-		"resp_type": "ok",
-	}).Add(float64(time.Since(time0).Milliseconds()))
 	return &pb.SetReply{}, nil
 }
 
-func (s *HeadServer) Get(ctx context.Context, request *pb.GetRequest) (*pb.GetReply, error) {
+func (s *HeadServer) Get(ctx context.Context, request *pb.GetRequest) (resp *pb.GetReply, err error) {
 	time0 := time.Now()
+	defer func() {
+		if err == nil {
+			metrics.ObserveRequests("get", "ok")
+			metrics.ObserveRequestsTimeSum("set", "ok", time.Since(time0).Seconds())
+		} else {
+			errStatus, _ := status.FromError(err)
+			metrics.ObserveRequests("get", errStatus.Code().String())
+			metrics.ObserveRequestsTimeSum("set", errStatus.Code().String(), time.Since(time0).Seconds())
+		}
+	}()
 
-	row, err := s.ClickhouseClient.GetRow(request.GetUserId(), request.GetVideoId())
-
-	if errors.Is(err, sql.ErrNoRows) {
-		return nil, status.Errorf(codes.NotFound, "No data: %s", err)
-	}
+	fromCache, err := s.CacheClient.CheckCache(ctx, request)
 	if err != nil {
-		return nil, status.Errorf(codes.Unavailable, "Failed to receive data from Clickhouse: %s", err)
+		log.Printf("failed to get data from cache: %s", err)
 	}
 
-	metrics.RequestsMetric.With(prometheus.Labels{
-		"type":      "get",
-		"resp_type": "ok",
-	}).Inc()
-	metrics.RequestsTimeSum.With(prometheus.Labels{
-		"type":      "get",
-		"resp_type": "ok",
-	}).Add(float64(time.Since(time0).Milliseconds()))
-	return &pb.GetReply{VideoTime: row.VideoTimestamp}, nil
+	var res *pb.GetReply
+	if fromCache != nil {
+		res = fromCache
+	} else {
+		row, err := s.ClickhouseClient.GetRow(request.GetUserId(), request.GetVideoId())
+
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, status.Errorf(codes.NotFound, "No data: %s", err)
+		}
+		if err != nil {
+			return nil, status.Errorf(codes.Unavailable, "Failed to receive data from Clickhouse: %s", err)
+		}
+
+		res = &pb.GetReply{VideoTime: row.VideoTimestamp}
+	}
+
+	return res, nil
 }

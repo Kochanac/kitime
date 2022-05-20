@@ -25,13 +25,19 @@ services:
     depends_on:
       - zookeeper
 
+  redis:
+    image: 'redislabs/redismod'
+    ports:
+        - '6379:6379'
+
   app:
-    image: 'head'
+    image: 'kitime'
+    restart: on-failure
     ports:
         - '23:9666'
         - '9100:9100'
     environment:
-        - REDIS_HOST=localhost
+        - REDIS_HOST=redis:6379
         - KAFKA_HOST=kafka:9092
         - KAFKA_TOPIC=test-topic
         - CLICK_HOST=clickhouse:9000

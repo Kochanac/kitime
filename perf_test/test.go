@@ -7,9 +7,11 @@ import (
 	"github.com/jhump/protoreflect/desc"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
+	"math"
 	"math/rand"
 	"os"
 	pb "perf_test/internal/api"
+	"time"
 )
 
 func dataFunc(mtd *desc.MethodDescriptor, cd *runner.CallData) []byte {
@@ -25,17 +27,22 @@ func dataFunc(mtd *desc.MethodDescriptor, cd *runner.CallData) []byte {
 }
 
 func main() {
-	var rps uint = 16000
+	var rps uint = 3000
 	report, err := runner.Run(
 		"head.head.Set",
 		"151.248.117.121:80",
 		runner.WithProtoFile("../service/api/api.proto", []string{}),
 		runner.WithInsecure(true),
 		runner.WithBinaryDataFunc(dataFunc),
-		runner.WithTotalRequests(rps*200),
+		runner.WithTotalRequests(rps*2000),
 		runner.WithRPS(rps),
 		runner.WithAsync(true),
 		runner.WithConnections(8),
+		runner.WithLoadStart(rps),
+		runner.WithLoadEnd(rps*2),
+		runner.WithLoadStepDuration(time.Second*30),
+		runner.WithLoadStep(int(math.Floor(float64(rps)/5))),
+		runner.WithLoadSchedule("step"),
 	)
 
 	if err != nil {

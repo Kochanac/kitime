@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	pb "github.com/Kochanac/kitime/service/internal/api"
+	"github.com/Kochanac/kitime/service/internal/cache"
 	"github.com/Kochanac/kitime/service/internal/clickhouse"
 	"github.com/Kochanac/kitime/service/internal/kafka"
 	"github.com/Kochanac/kitime/service/internal/metrics"
@@ -13,6 +14,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"time"
 
 	"google.golang.org/grpc"
 )
@@ -41,6 +43,7 @@ func main() {
 		Config:           c,
 		KafkaProducer:    producer,
 		ClickhouseClient: clickhouse.Init(c.GetClickhouseHost(), c.GetClickhouseUser(), c.GetClickhousePassword()),
+		CacheClient:      cache.InitCache(c.GetRedisHost(), time.Minute*10),
 	})
 
 	http.Handle("/metrics", promhttp.Handler())

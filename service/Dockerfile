@@ -2,6 +2,7 @@ FROM --platform=linux/amd64 golang:alpine as builder
 RUN mkdir /build
 ADD . /build/
 WORKDIR /build
+RUN go mod download
 RUN go build -o head cmd/main.go
 
 FROM --platform=linux/amd64 alpine 

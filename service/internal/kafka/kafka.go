@@ -24,7 +24,7 @@ func InitProducer(c config.Config) (Producer, error) {
 	saramaConfig.Producer.Retry.Max = 5
 	saramaConfig.Producer.RequiredAcks = sarama.WaitForAll
 	saramaConfig.Producer.Return.Successes = true
-	saramaConfig.ClientID = "vobla-producer"
+	saramaConfig.ClientID = "kitime-producer"
 
 	prd, err := sarama.NewSyncProducer([]string{c.GetKafkaHost()}, saramaConfig)
 	if err != nil {

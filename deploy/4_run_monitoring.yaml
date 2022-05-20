@@ -94,24 +94,3 @@
                 #   port: "9100"
                 selector: {}
 
-
-    # - name: Deploy Pod Monitors
-      # kubernetes.core.k8s:
-      #   state: present
-      #   definition:
-      #     apiVersion: monitoring.coreos.com/v1
-      #     kind: PodMonitor
-      #     metadata:
-      #       name: pod-monitor-kitime
-      #       namespace: monitoring
-      #     spec:
-      #       selector:
-      #         matchLabels:
-      #           metrics: service_kitime
-      #       namespaceSelector:
-      #         any: true
-      #       podMetricsEndpoints:
-      #       - path: /metrics
-      #         port: "9100"
-            
-
