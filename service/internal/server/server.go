@@ -21,7 +21,7 @@ type HeadServer struct {
 	pb.HeadServer
 	Config           config.Config
 	KafkaProducer    kafka.Producer
-	ClickhouseClient clickhouse.Client
+	ClickhouseClient clickhouse.ClickhouseClient
 	CacheClient      cache.Cache
 }
 

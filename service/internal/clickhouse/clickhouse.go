@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-type Client interface {
+type ClickhouseClient interface {
 	GetRow(userID, videoID uint32) (UserVideoTimesRow, error)
 }
 
@@ -31,7 +31,7 @@ func (c clickhouseClient) GetRow(userID, videoID uint32) (res UserVideoTimesRow,
 	return
 }
 
-func Init(host, user, password string) Client {
+func Init(host, user, password string) ClickhouseClient {
 	conn := clickhouse.OpenDB(&clickhouse.Options{
 		Addr: []string{host},
 		Auth: clickhouse.Auth{
