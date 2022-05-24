@@ -27,7 +27,7 @@
   "gnetId": 315,
   "graphTooltip": 0,
   "id": 27,
-  "iteration": 1653002865083,
+  "iteration": 1653331084404,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -283,14 +283,92 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum by (pod) (rate(requests_time_sum[1m])) \n/\nsum by (pod) (rate(requests[1m])) ",
+          "expr": "sum by (pod) (rate(requests_time_sum[1m])) \n/\nsum by (pod) (rate(requests[1m])) \n* 1000",
           "legendFormat": "{{pod}}",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "RT (mean) [1m] by pod",
+      "title": "RT (mean, ms) [1m] by pod",
       "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 0
+              },
+              {
+                "color": "#EAB839",
+                "value": 5000
+              },
+              {
+                "color": "#6ED0E0",
+                "value": 7500
+              },
+              {
+                "color": "green",
+                "value": 10000
+              },
+              {
+                "color": "purple",
+                "value": 16000
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 10,
+        "x": 14,
+        "y": 8
+      },
+      "id": 57,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.5.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum (rate(requests_time_sum[1m])) \n/\nsum (rate(requests[1m])) \n* 1000",
+          "refId": "A"
+        }
+      ],
+      "title": "RT (mean, ms) [1m]",
+      "type": "stat"
     },
     {
       "collapsed": false,
@@ -3130,25 +3208,6 @@
           "uid": "prometheus"
         },
         "definition": "",
-        "error": {
-          "config": {
-            "headers": {
-              "X-Grafana-Org-Id": 1
-            },
-            "hideFromInspector": true,
-            "method": "GET",
-            "retry": 0,
-            "url": "api/datasources/proxy/1/api/v1/label/kubernetes_io_hostname/values?start=1653002555&end=1653002855"
-          },
-          "data": {
-            "error": "Gateway Timeout",
-            "message": "Gateway Timeout",
-            "response": ""
-          },
-          "message": "Gateway Timeout",
-          "status": 504,
-          "statusText": "Gateway Timeout"
-        },
         "hide": 0,
         "includeAll": true,
         "multi": false,
@@ -3198,6 +3257,6 @@
   "timezone": "browser",
   "title": "Kubernetes cluster monitoring (via Prometheus)",
   "uid": "z4fpphXnz",
-  "version": 22,
+  "version": 5,
   "weekStart": ""
 }
